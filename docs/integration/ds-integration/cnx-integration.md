@@ -238,13 +238,14 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
     ```
 ### Restarting WAS
 
-    ```bash
-    /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/stopManager.sh
-    /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/startManager.sh
-    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopNode.sh -stopservers
-    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/syncNode.sh DMGR_HOSTNAME
-    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startNode.sh
-    ```
+```bash
+/opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/stopManager.sh
+/opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/startManager.sh
+/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopNode.sh -stopservers
+/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/syncNode.sh DMGR_HOSTNAME
+/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startNode.sh
+```
+
 ## Testing the OIDC login flow
 
 - Open browser and navigate to `https://<CNX_HOSTNAME>/homepage`
