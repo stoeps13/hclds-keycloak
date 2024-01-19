@@ -167,9 +167,9 @@ In the ISC, navigate to **Security** &rarr; **federated repositories** –> **co
 
 ## Updating httpd.conf file for redirection rules
 
-Path - /opt/IBM/HTTPServer/conf/httpd.conf
+### `/opt/IBM/HTTPServer/conf/httpd.conf`
 
-```sh
+```Apache
 Header edit Set-Cookie ^(.*)$ "$1; SameSite=None;Secure"
 Redirect "/realms/hcl/.well-known/openid-configuration" "https://<IDP_HOSTNAME>/realms/hcl/.well-known/openid-configuration"
 
@@ -188,7 +188,7 @@ Make sure to save the changes.
 
 ### Restarting the IHS server
 
-```sh
+```bash
 cd /opt/IBM/HTTPServer/bin/
 sudo systemctl stop ihs
 sudo systemctl start ihs
@@ -198,11 +198,11 @@ sudo systemctl start ihs
 
 Next, we need to make a couple of updates in the `LotusConnections-config.xml` the `service-location.xsd` and the `opensocial-config.xml`
 
-Path - `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CELLNAME/LotusConnections-config/LotusConnections-config.xml`
+### `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CELLNAME/LotusConnections-config/LotusConnections-config.xml`
 
   - LCC Changes:
 
-    ```sh
+    ```xml
     <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="true" serviceName="oidc_op" ssl_enabled="true">
       <sloc:href>
         <sloc:hrefPathPrefix>/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration</sloc:hrefPathPrefix>
@@ -214,7 +214,7 @@ Path - `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CE
 
   - Add/Edit Below generic props
 
-    ```sh
+    ```xml
     <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokens">true</genericProperty>  
     <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokensFromSubject">true</genericProperty>
     <genericProperty name="com.hcl.connections.rte.azureEnabled">true</genericProperty>
@@ -222,18 +222,18 @@ Path - `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CE
 
   - HCL Connections has default client id as "hcl-cnx-oidc-client", can be overridden by adding/updating below generic property
 
-    ```sh
+    ```xml
     <genericProperty name="oidcClientId">KEYCLOAK_CLIENTID</genericProperty>
     ```
 
   - Add Service entry in service-location.xsd file (If not present)
 
-    ```sh
+    ```xml
     <xsd:enumeration value="oidc_op"/>
     ```
   - Update opensocial-config.xml
 
-    ```sh
+    ```xml
     <connections-ee-settings preloadJS="false" preloadJSSafari="true" useSSO="true">
     ```
 ### Restarting WAS
