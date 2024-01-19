@@ -52,8 +52,8 @@ Although these tasks will generally work, we are using references for how a conf
   ADMA5013I: Application WebSphereOIDCRP installed successfully.
   ```
 
-:note: You need this application for each Application cluster. The webroots for
-these apps needs to be different!
+>[!NOTE]
+> You need this application for each Application cluster. The webroots for these apps needs to be different!
 
   - Open the ISC and go to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **WebsphereOIDCRP** &rarr; **Manage modules**
 
