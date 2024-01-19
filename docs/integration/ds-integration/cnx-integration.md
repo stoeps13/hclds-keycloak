@@ -54,7 +54,16 @@ Although these tasks will generally work, we are using references for how a conf
 
 >[!NOTE]
 > You need this application for each Application cluster. The webroots for these apps needs to be different!
+>
+> This process can be scripted and prevents errors. You can use the script
+> [config_oidc.py](assets/config_oidc.py) to update your WebSphere
+> configuration, but you have to set the trusted realm, import the ssl
+> certificate and restart.
 
+```python
+cd /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin
+./wsadmin.sh -lang jython -f config_oidc.py
+```
   - Open the ISC and go to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **WebsphereOIDCRP** &rarr; **Manage modules**
 
   - Select available module and click “Apply” then “OK”.
