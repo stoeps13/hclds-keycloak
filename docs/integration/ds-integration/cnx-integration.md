@@ -51,7 +51,7 @@ Although these tasks will generally work, we are using references for how a conf
   ...
   ADMA5013I: Application WebSphereOIDCRP installed successfully.
   ```
-  - Open the ISC and go to **Applications** -> **Application types** -> **Enterprise Applications** -> **WebsphereOIDCRP** -> **Manage modules**
+  - Open the ISC and go to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **WebsphereOIDCRP** &rarr; **Manage modules**
 
   - Select available module and click “Apply” then “OK”.
 
@@ -61,18 +61,18 @@ Although these tasks will generally work, we are using references for how a conf
 
 The following configuration will allow the OIDC RP TAI to contextualize which requests should be intercepted and how to treat them. In particular, this configuration is thightly connected to the Keycloak realm and client configuration.
 
-The interceptor can be configured in the ISC under **Security** -> **Global Security** -> **Web and SIP security** -> **Trust association** -> **Interceptors**.
+The interceptor can be configured in the ISC under **Security** &rarr; **Global Security** &rarr; **Web and SIP security** &rarr; **Trust association** &rarr; **Interceptors**.
 
 Click on the **New..** button to create a new interceptor with the **Interceptor class name** `com.ibm.ws.security.oidc.client.RelyingParty`.
 
 **Note**: If the interceptor already exists, just click on it to access the configuration properties instead of creating it again.
 
 **Prepare the following variables:**
-- IDP_HOSTNAME: Hostname of your keycloak server
-- KEYCLOAK_REALMNAME: Name of the Realm in Keycloak
-- KEYCLOAK_CLIENTID: Client Id for the OIDC Client in Keycloak
-- KEYCLOAK_OIDC_SECRET: OIDC secret created in Keycloak
-- DMGR_SSL_TRUST_KEYCLOAK: Name of the trusted SSL Certificate in WebSphere
+- `IDP_HOSTNAME`: Hostname of your keycloak server
+- `KEYCLOAK_REALMNAME`: Name of the Realm in Keycloak
+- `KEYCLOAK_CLIENTID`: Client Id for the OIDC Client in Keycloak
+- `KEYCLOAK_OIDC_SECRET`: OIDC secret created in Keycloak
+- `DMGR_SSL_TRUST_KEYCLOAK`: Name of the trusted SSL Certificate in WebSphere
   Deployment Manager
 
 Add the following custom properties and adjust with above variables:
@@ -109,7 +109,7 @@ Afterwards, hit **Apply** and **OK**. To persist the changes, click the link **S
 
 ### Updating WAS security properties
 
-Some custom properties have to be updated to match the OIDC TAI config and its expected behavior. To do so, go to **Security** -> **Global security** -> **Custom properties**.
+Some custom properties have to be updated to match the OIDC TAI config and its expected behavior. To do so, go to **Security** &rarr; **Global security** &rarr; **Custom properties**.
 
 First, delete the property `com.ibm.websphere.security.InvokeTAIbeforeSSO` if it exists.
 
@@ -131,7 +131,7 @@ Persist the changes via the **Save** link.
 
 In order to allow internal HTTPS communication with Keycloak, we need to add the hostname (FQDN) to the WebSphere trust store.
 
-In the ISC, navigate to **Security** -> **SSL certificate and key management** -> **Key stores and certificates** -> **CellDefaultTrustStore** -> **Signer Certificates** -> **Retrieve from port**
+In the ISC, navigate to **Security** &rarr; **SSL certificate and key management** &rarr; **Key stores and certificates** &rarr; **CellDefaultTrustStore** &rarr; **Signer Certificates** &rarr; **Retrieve from port**
 
 Set the following properties:
 
@@ -147,7 +147,7 @@ Click **OK**, and **save** to the master configuration.
 
 ## Adding an external realm
 
-In the ISC, navigate to **Security** -> **federated repositories** –> **configure** -> **Trusted authentication realms – inbound** -> **Add external realm** -> hcl.
+In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; hcl.
 
 
 ### Restarting the server
@@ -160,7 +160,7 @@ In the ISC, navigate to **Security** -> **federated repositories** –> **config
 ## Changing security roles for users and groups in CNX applications
 
 - Go to the ISC
-- Navigate to **Applications** -> **Application types** -> **Enterprise Applications** -> **Select app** -> **Security role to user/group mapping**
+- Navigate to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **Select app** &rarr; **Security role to user/group mapping**
 - Change from All Authenticated in Application's Realms to All Authenticated in Trusted Realms
 - Then click **OK** and **save** to the master configuration.
 - Follow above step for all apps
