@@ -238,7 +238,7 @@ Path - `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CE
     ```
 ### Restarting WAS
 
-    ```sh
+    ```bash
     /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/stopManager.sh
     /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/startManager.sh
     /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopNode.sh -stopservers
