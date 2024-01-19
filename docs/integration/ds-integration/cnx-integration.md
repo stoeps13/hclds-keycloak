@@ -226,12 +226,12 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
     <genericProperty name="oidcClientId">KEYCLOAK_CLIENTID</genericProperty>
     ```
 
-  - Add Service entry in service-location.xsd file (If not present)
+### Add Service entry in `service-location.xsd` file (If not present)
 
     ```xml
     <xsd:enumeration value="oidc_op"/>
     ```
-  - Update opensocial-config.xml
+### Update `opensocial-config.xml`
 
     ```xml
     <connections-ee-settings preloadJS="false" preloadJSSafari="true" useSSO="true">
