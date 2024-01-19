@@ -11,8 +11,8 @@ On a high level, the following tasks will be executed to establish this configur
 
 - Install the OIDC RP TAI for WebSphere
 - Configure the OIDC RP TAI against your IdP
-- Update WAS security properties to match the new TAI requirements
 - Add the server certificate to the WAS trust store to allow internal HTTPS communication
+- Update WAS security properties to match the new TAI requirements
 - Add external realm in federated repository
 - Change role mappings in CNX applications
 - Add redirection rules in IHS
@@ -56,6 +56,24 @@ Although these tasks will generally work, we are using references for how a conf
   - Select available module and click “Apply” then “OK”.
 
     ![Leap OIDC config](./images/CNX_OIDC_Config_1.png)
+
+## Adding the hostname/server certificate to the WAS trust store
+
+In order to allow internal HTTPS communication with Keycloak, we need to add the hostname (FQDN) to the WebSphere trust store.
+
+In the ISC, navigate to **Security** &rarr; **SSL certificate and key management** &rarr; **Key stores and certificates** &rarr; **CellDefaultTrustStore** &rarr; **Signer Certificates** &rarr; **Retrieve from port**
+
+Set the following properties:
+
+| Name    | Value                                                                                     |
+| ------- | ----------------------------------------------------------------------------------------- |
+| Host    | &lt;IDP_HOSTNAME&gt;                                                                      |
+| Port    | 443                                                                                       |
+| Alias   | hcl-idp-cert (**Note**: same as provided in above interceptor property `signVerifyAlias`) |
+
+Then, click on **Retrieve signer information**. This will load the certificate details.
+
+Click **OK**, and **save** to the master configuration.
 
 ## Configuring the OIDC RP TAI against your IdP
 
@@ -127,24 +145,6 @@ Afterwards, add or update following properties:
 
 Persist the changes via the **Save** link.
 
-## Adding the hostname/server certificate to the WAS trust store
-
-In order to allow internal HTTPS communication with Keycloak, we need to add the hostname (FQDN) to the WebSphere trust store.
-
-In the ISC, navigate to **Security** &rarr; **SSL certificate and key management** &rarr; **Key stores and certificates** &rarr; **CellDefaultTrustStore** &rarr; **Signer Certificates** &rarr; **Retrieve from port**
-
-Set the following properties:
-
-| Name    | Value                                                                                     |
-| ------- | ----------------------------------------------------------------------------------------- |
-| Host    | &lt;IDP_HOSTNAME&gt;                                                                      |
-| Port    | 443                                                                                       |
-| Alias   | hcl-idp-cert (**Note**: same as provided in above interceptor property `signVerifyAlias`) |
-
-Then, click on **Retrieve signer information**. This will load the certificate details.
-
-Click **OK**, and **save** to the master configuration.
-
 ## Adding an external realm
 
 In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; hcl.
@@ -171,7 +171,7 @@ Path - /opt/IBM/HTTPServer/conf/httpd.conf
 
 ```sh
 Header edit Set-Cookie ^(.*)$ "$1; SameSite=None;Secure"
-Redirect "/realms/hcl/.well-known/openid-configuration" "https://<IDP_HOSTNAME>/auth/realms/hcl/.well-known/openid-configuration"
+Redirect "/realms/hcl/.well-known/openid-configuration" "https://<IDP_HOSTNAME>/realms/hcl/.well-known/openid-configuration"
 
 Redirect /communities/login /communities/service/html/login
 Redirect /homepage/login /homepage
@@ -198,16 +198,16 @@ sudo systemctl start ihs
 
 Next, we need to make a couple of updates in the `LotusConnections-config.xml` the `service-location.xsd` and the `opensocial-config.xml`
 
-Path - /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/bvt1Node01Cell/LotusConnections-config/LotusConnections-config.xml
+Path - `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CELLNAME/LotusConnections-config/LotusConnections-config.xml`
 
   - LCC Changes:
 
     ```sh
     <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="true" serviceName="oidc_op" ssl_enabled="true">
       <sloc:href>
-        <sloc:hrefPathPrefix>/auth/realms/hcl/.well-known/openid-configuration</sloc:hrefPathPrefix>
-        <sloc:static href="http://<IDP_HOSTNAME>" ssl_href="https://<IDP_HOSTNAME>"/>
-        <sloc:interService href="https://<IDP_HOSTNAME>"/>
+        <sloc:hrefPathPrefix>/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration</sloc:hrefPathPrefix>
+        <sloc:static href="http://IDP_HOSTNAME" ssl_href="https://IDP_HOSTNAME"/>
+        <sloc:interService href="https://IDP_HOSTNAME"/>
       </sloc:href>
     </sloc:serviceReference>
     ```
@@ -223,7 +223,7 @@ Path - /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/bvt1Node01Cel
   - HCL Connections has default client id as "hcl-cnx-oidc-client", can be overridden by adding/updating below generic property
 
     ```sh
-    <genericProperty name="oidcClientId">{CLIENT_ID}</genericProperty>
+    <genericProperty name="oidcClientId">KEYCLOAK_CLIENTID</genericProperty>
     ```
 
   - Add Service entry in service-location.xsd file (If not present)
@@ -239,8 +239,11 @@ Path - /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/bvt1Node01Cel
 ### Restarting WAS
 
     ```sh
-    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopServer.sh server1
-    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startServer.sh server1
+    /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/stopManager.sh
+    /opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/startManager.sh
+    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopNode.sh -stopservers
+    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/syncNode.sh DMGR_HOSTNAME
+    /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startNode.sh
     ```
 ## Testing the OIDC login flow
 
