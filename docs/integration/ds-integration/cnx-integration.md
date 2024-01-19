@@ -67,33 +67,43 @@ Click on the **New..** button to create a new interceptor with the **Interceptor
 
 **Note**: If the interceptor already exists, just click on it to access the configuration properties instead of creating it again.
 
-Add the following custom properties:
+**Prepare the following variables:**
+- IDP_HOSTNAME: Hostname of your keycloak server
+- KEYCLOAK_REALMNAME: Name of the Realm in Keycloak
+- KEYCLOAK_CLIENTID: Client Id for the OIDC Client in Keycloak
+- KEYCLOAK_OIDC_SECRET: OIDC secret created in Keycloak
+- DMGR_SSL_TRUST_KEYCLOAK: Name of the trusted SSL Certificate in WebSphere
+  Deployment Manager
+
+Add the following custom properties and adjust with above variables:
 
 | Name                                  | Value                                                                                   |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
-| provider_1.identifier                 | hcl                                                                                     |
-| provider_1.clientId                   | hcl-cnx-oidc-client                                                                     |
-| provider_1.clientSecret               | &lt;CLIENT_SECRET&gt;                                                                   |
-| provider_1.authorizeEndpointUrl       | https://&lt;IDP_HOSTNAME&gt;/auth/realms/hcl/protocol/openid-connect/auth               |
-| provider_1.tokenEndpointUrl           | https://&lt;IDP_HOSTNAME&gt;/auth/realms/hcl/protocol/openid-connect/token              |
-| provider_1.interceptedPathFilter      | /activities/.\*,/blogs/.\*,/dogear/.\*,/files/.\*,/forums/.\*,/metrics/.\*,/metricssc/_,/mobile/.\*,/connections/filesync/.\*,/connections/filediff/.\*,/mobileAdmin/.\*,/storageproxy/.\*,/wikis/.\*,/connections/bookmarklet/.\*,/connections/oauth/.\*,/connections/resources/.\*,/connections/config/.\*,/communities/.\*,/connections/proxy/.\*,/help/.\*,/xcc/.\*,/selfservice/.\*,/news/.\*,/profiles/.\*,/search/.\*,/socialsidebar/.\*,/touchpoint/.\*,/connections/thumbnail/.\*,/connections/opengraph/.\*,/oauth2/.\*,/connections/opensocial/.\*,/push/.\*,/homepage/.\*,/moderation/.\*,/connections/rte/.\*,/connections/webeditors/.\*,/homepage/login/.\*,/profiles/oidc/session                                                                                                                           |
-| provider_1.excludedPathFilter         | /activities/service/downloadExtended/.\*,/survey/.\*,/surveys/.\*,/ibm/console,/ibm/console/.\*,/profiles/dsx/.\*,/communities/dsx/.\*,/dm,/dm/atom/seedlist,/dm/atom/communities/feed,/activities/service/atom2/forms/communityEvent,/communities/recomm/handleEvent,/communities/calendar/handleEvent,/profiles/seedlist/myserver,/activities/service/atom2/forms/communityEvent,/news/web/statusUpdateEE.\*,/dogear/seedlist/myserver,/news/seedlist/myserver,/communities/calendar/seedlist/myserver,/activities/service/downloadExtended/.\*,/survey/.\*,/surveys/.\*,/ibm/console,/ibm/console/.\*,/profiles/dsx/.\*,/communities/dsx/.\*,/dm,/dm/atom/seedlist,/dm/atom/communities/feed,/activities/service/atom2/forms/communityEvent,/communities/recomm/handleEvent,/communities/calendar/handleEvent,/profiles/seedlist/myserver,/activities/service/atom2/forms/communityEvent,/news/web/statusUpdateEE.\*,/dogear/seedlist/myserver,/news/seedlist/myserver,/communities/calendar/seedlist/myserver,/mobile/homepage/SecurityConfiguration,/connections/resources/web/.\*,/connections/resources/ic/.\*,/connections/opensocial/rpc,/xcc/js/.\*,/xcc/templates/.\*,/files/static/.\*,/blogs/static/.\*,/wikis/static/.\*,/communities/calendar/Calendar.xml,/homepage/web/itemSetPersistence.action/repos,/files/wl/lifecycle/files,/wikis/wl/lifecycle/wikis,/forums/lifecycle/communityEvent,/blogs/roller-ui/BlogsWidgetEventHandler.do,/news/widget/communityHandler.do,/connections/opensocial/rest/people/.\*                                                                                                                                |
-| provider_1.issuerIdentifier           | https://&lt;IDP_HOSTNAME&gt;/auth/realms/hcl                                            |
-| provider_1.signatureAlgorithm         | RS256                                                                                   |
-| provider_1.jwkEndpointUrl             | https://&lt;IDP_HOSTNAME&gt;/auth/realms/hcl/protocol/openid-connect/certs              |
-| provider_1.userIdentifier             | email                                                                                   |
-| provider_1.userDefaultIdentifierFirst | false                                                                                   |
-| provider_1.scope                      | openid                                                                                  |
-| provider_1.signVerifyAlias            | hcl-idp-cert                                                                            |
-| provider_1.useJwtFromRequest          | IfPresent                                                                               |
-| provider_1.createSession              | true                                                                                    |
-| provider_1.verifyIssuerInIat          | true                                                                                    |
-| provider_1.audiences                  | ALL_AUDIENCES                                                                           |
-| provider_1.setLtpaCookie              | true                                                                                    |
-| provider_1.callbackServletContext     | /oidcclient                                                                             |
-| provider_1.mapIdentityToRegistryUser  | true                                                                                    |
+| provider_1.clientId                   | `KEYCLOAK_CLIENTID`                                                                     |
+| provider_1.clientSecret               | `KEYCLOAK_CLIENTSECRET`                                                                 |
+| provider_1.defaultRealmName           | `KEYCLOAK_REALMNAME`                                                                    |
+| provider_1.discoveryEndpointUrl       | https://`IDP_HOSTNAME`/realms/`KEYCLOAK_REALMNAME`/.well-known/openid-configuration      |
+| provider_1.identifier                 | `KEYCLOAK_REALMNAME`                                                                    |
+| provider_1.signVerifyAlias            | `DMGR_SSL_TRUST_KEYCLOAK`                                                               |
 
-- **Note** - Make sure to replace the `<IDP_HOSTNAME>` and `<CLIENT_SECRET>` placeholders with your respective details. The client secret is available through your IdP client configuration. Also ensure other properties match your environment configuration, i.e. the path filter matches your DX context, the OIDC URLs match your IdP endpoint structure, the right client id is being used etc.
+The values have fixed values and can just be copy and pasted:
+
+| Name                                  | Value                                                                                   |
+| ------------------------------------- | --------------------------------------------------------------------------------------- |
+| provider_1.audiences                  | ALL_AUDIENCES                                                                           |
+| provider_1.createSession              | true                                                                                    |
+| provider_1.excludedPathFilter         | /activities/service/atom2/forms/communityEvent,/activities/service/atom2/.*,/activities/service/downloadExtended/.*,/blogs/roller-ui/BlogsWidgetEventHandler.do,/blogs/static/.*,/communities/calendar/Calendar.xml,/communities/calendar/handleEvent,/communities/calendar/seedlist/myserver,/communities/dsx/.*,/connections/rte/community/.*,/communities/recomm/handleEvent,/communities/recomm/Recomm.xml.*,/connections/opensocial/rest/people/.*,/connections/opensocial/basic/rest/.*,/connections/opensocial/rpc,/connections/resources/ic/.*,/connections/resources/web/.*,/docs/api/*,/dogear/seedlist/myserver,/files/static/.*,/files/wl/lifecycle/files,/forums/lifecycle/communityEvent,/homepage/web/itemSetPersistence.action/repos,/mobile/homepage/SecurityConfiguration,/news/seedlist/myserver,/news/web/statusUpdateEE.*,/news/widget/communityHandler.do,/profiles/dsx/.*,/profiles/seedlist/myserver,/viewer/api/*,/wikis/static/.*,/wikis/wl/lifecycle/wikis,/xcc/js/.*,/xcc/templates/.*                                  |
+| provider_1.idMap                      | localRealm                                                                              |
+| provider_1.realmIdentifier            | realmName                                                                               | 
+| provider_1.scope                      | openid                                                                                  |
+| provider_1.setLtpaCookie              | true                                                                                    |
+| provider_1.useDefaultIdentifierFirst  | false                                                                                   |
+| provider_1.useDiscovery               | true                                                                                    |
+| provider_1.useJwtFromRequest          | ifPresent                                                                               |
+| provider_1.useRealm                   | WAS_DEFAULT                                                                             |
+| provider_1.useUrlCookies              | true                                                                                    |
+| provider_1.userIdentifier             | email                                                                                   |
+| provider_1.verifyIssuerInIat          | true                                                                                    |
 
 Afterwards, hit **Apply** and **OK**. To persist the changes, click the link **Save** directly to the master configuration in the alert message.
 
@@ -101,9 +111,9 @@ Afterwards, hit **Apply** and **OK**. To persist the changes, click the link **S
 
 Some custom properties have to be updated to match the OIDC TAI config and its expected behavior. To do so, go to **Security** -> **Global security** -> **Custom properties**.
 
-First, delete the property `com.ibm.websphere.security.DeferTAItoSSO` if it exists.
+First, delete the property `com.ibm.websphere.security.InvokeTAIbeforeSSO` if it exists.
 
-Change `com.ibm.websphere.security.InvokeTAIbeforeSSO` to replace existing with `com.ibm.ws.security.oidc.client.RelyingParty`
+Change `com.ibm.websphere.security.DeferTAItoSSO` to replace existing with `com.ibm.ws.security.oidc.client.RelyingParty`
 
 Afterwards, add or update following properties:
 
@@ -113,6 +123,7 @@ Afterwards, add or update following properties:
 | com.ibm.websphere.security.customLTPACookieName         | LtpaToken        |
 | com.ibm.websphere.security.customSSOCookieName          | LtpaToken2       |
 | com.ibm.websphere.security.disableGetTokenFromMBean     | false            |
+| com.ibm.websphere.security.alwaysRestoreOriginalURL     | false            |
 
 Persist the changes via the **Save** link.
 
