@@ -46,11 +46,15 @@ Although these tasks will generally work, we are using references for how a conf
   - First, install the OIDC RP TAI. See more details here: [Configuring an OpenID Connect Relying Party](https://www.ibm.com/docs/en/was-nd/9.0.5?topic=users-configuring-openid-connect-relying-party).
   ```sh
   cd /opt/IBM/WebSphere/AppServer/bin
-  wsadmin.sh -f installOIDCRP.py install bvt1Node01 server1
+  wsadmin.sh -f installOIDCRP.py install NODENAME CLUSTER
 
   ...
   ADMA5013I: Application WebSphereOIDCRP installed successfully.
   ```
+
+:note: You need this application for each Application cluster. The webroots for
+these apps needs to be different!
+
   - Open the ISC and go to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **WebsphereOIDCRP** &rarr; **Manage modules**
 
   - Select available module and click “Apply” then “OK”.
@@ -147,14 +151,17 @@ Persist the changes via the **Save** link.
 
 ## Adding an external realm
 
-In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; hcl.
+In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; `https://IDP_HOSTNAME/realms/KEYCLOAK_REALMNAME`
 
 
 ### Restarting the server
 
-```sh
-/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopServer.sh server1
-/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startServer.sh server1
+```bash
+/opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/stopManager.sh
+/opt/IBM/WebSphere/AppServer/profiles/Dmgr01/bin/startManager.sh
+/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/stopNode.sh -stopservers
+/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/syncNode.sh DMGR_HOSTNAME
+/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startNode.sh
 ```
 
 ## Changing security roles for users and groups in CNX applications
@@ -190,8 +197,8 @@ Make sure to save the changes.
 
 ```bash
 cd /opt/IBM/HTTPServer/bin/
-sudo systemctl stop ihs
-sudo systemctl start ihs
+sudo /opt/IBM/HTTPServer/bin/apachectl -k stop
+sudo /opt/IBM/HTTPServer/bin/apachectl -k start
 ```
 
 ## Updating the LotusConnections-config
