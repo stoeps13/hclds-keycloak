@@ -98,7 +98,8 @@ The interceptor can be configured in the ISC under **Security** &rarr; **Global 
 
 Click on the **New..** button to create a new interceptor with the **Interceptor class name** `com.ibm.ws.security.oidc.client.RelyingParty`.
 
-**Note**: If the interceptor already exists, just click on it to access the configuration properties instead of creating it again.
+>[!NOTE]
+> If the interceptor already exists, just click on it to access the configuration properties instead of creating it again.
 
 **Prepare the following variables:**
 - `IDP_HOSTNAME`: Hostname of your keycloak server
@@ -172,7 +173,8 @@ Persist the changes via the **Save** link.
 
 In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; `https://IDP_HOSTNAME/realms/KEYCLOAK_REALMNAME`
 
-If you use `provider_x.useRealm=WAS_DEFAULT` this is not necessary, because all token and cookie contain `defaultWIMFileBasedRealm` as the realmName. And this is always trusted. This needs at least WebSphere 8.5.5 FP23!
+>[!NOTE]
+> If you use `provider_x.useRealm=WAS_DEFAULT` this is not necessary, because all token and cookie contain `defaultWIMFileBasedRealm` as the realmName. And this is always trusted. This needs at least WebSphere 8.5.5 FP23!
 
 ### Restarting the server
 
@@ -219,42 +221,44 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
 
 ### `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CELLNAME/LotusConnections-config/LotusConnections-config.xml`
 
-  - LCC Changes:
+- LCC Changes:
 
-    ```xml
-    <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="false" serviceName="oidc_op" ssl_enabled="false">
-      <sloc:href>
-        <sloc:hrefPathPrefix>/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration</sloc:hrefPathPrefix>
-        <sloc:static href="http://IDP_HOSTNAME" ssl_href="https://IDP_HOSTNAME"/>
-        <sloc:interService href="https://IDP_HOSTNAME"/>
-      </sloc:href>
-    </sloc:serviceReference>
-    ```
+```xml
+<sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="false" serviceName="oidc_op" ssl_enabled="false">
+  <sloc:href>
+    <sloc:hrefPathPrefix>/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration</sloc:hrefPathPrefix>
+    <sloc:static href="http://IDP_HOSTNAME" ssl_href="https://IDP_HOSTNAME"/>
+    <sloc:interService href="https://IDP_HOSTNAME"/>
+  </sloc:href>
+</sloc:serviceReference>
+```
 
-  - Add/Edit Below generic props
+- Add/Edit Below generic props
 
-    ```xml
-    <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokens">true</genericProperty>
-    <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokensFromSubject">true</genericProperty>
-    <genericProperty name="com.hcl.connections.rte.azureEnabled">false</genericProperty>
-    ```
+```xml
+<genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokens">true</genericProperty>
+<genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokensFromSubject">true</genericProperty>
+<genericProperty name="com.hcl.connections.rte.azureEnabled">false</genericProperty>
+```
 
-  - HCL Connections has default client id as "hcl-cnx-oidc-client", can be overridden by adding/updating below generic property
+- HCL Connections has default client id as "hcl-cnx-oidc-client", can be overridden by adding/updating below generic property
 
-    ```xml
-    <genericProperty name="oidcClientId">KEYCLOAK_CLIENTID</genericProperty>
-    ```
+```xml
+<genericProperty name="oidcClientId">KEYCLOAK_CLIENTID</genericProperty>
+```
 
 ### Add Service entry in `service-location.xsd` file (If not present)
 
-    ```xml
-    <xsd:enumeration value="oidc_op"/>
-    ```
+```xml
+<xsd:enumeration value="oidc_op"/>
+```
+
 ### Update `opensocial-config.xml`
 
-    ```xml
-    <connections-ee-settings preloadJS="false" preloadJSSafari="true" useSSO="true">
-    ```
+```xml
+<connections-ee-settings preloadJS="false" preloadJSSafari="true" useSSO="true">
+```
+
 ### Restarting WAS
 
 ```bash
