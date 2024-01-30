@@ -41,38 +41,40 @@ def getCommonCustomTaiProps(providerId):
     customTaiProps=[]
     # These Props need adjustments for your environment!
     # ----------------------------
-    # Keycloak Clients > Client ID
-    customTaiProps.append(['%s.clientId' % (providerId), 'KEYCLOAK_CLIENTID' ])
+    # Keycloak > Clients > Client ID
+    customTaiProps.append(['%s.clientId' % (providerId), 'stoeps-cnx-oidc-client' ])
     # Client Secret from Keycloak > Clients > Client ID > your clientId > Credentials
-    customTaiProps.append(['%s.clientSecret' % (providerId), 'KEYCLOAK_OIDC_SECRET' ])
+    customTaiProps.append(['%s.clientSecret' % (providerId), 'Af5g1bmzY6eMP3D5HvPHu2sPeumxBf8x' ])
     # Name of Keycloak Realm
-    customTaiProps.append(['%s.defaultRealmName' % (providerId), 'KEYCLOAK_REALMNAME'])
+    customTaiProps.append(['%s.defaultRealmName' % (providerId), 'kccnx8'])
     # Discovery Url dependent to hostname and realmname
-    customTaiProps.append(['%s.discoveryEndpointUrl' % (providerId), 'https://IDP_HOSTNAME/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration'])
+    customTaiProps.append(['%s.discoveryEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/.well-known/openid-configuration'])
     # Keycloak Realm
-    customTaiProps.append(['%s.identifier' % (providerId), 'KEYCLOAK_REALMNAME' ])
+    customTaiProps.append(['%s.identifier' % (providerId), 'kccnx8' ])
     # Name of trusted Certificate in DMGR
-    customTaiProps.append(['%s.signVerifyAlias' % (providerId), 'DMGR_SSL_TRUST_KEYCLOAK' ])
+    customTaiProps.append(['%s.signVerifyAlias' % (providerId), 'stoeps-idp-cert' ])
     # -----------------------------
-    # customTaiProps.append(['%s.mapIdentityToRegistryUser' % (providerId), 'true'])
+    #customTaiProps.append(['%s.useRealm' % (providerId), 'WAS_DEFAULT'])
     #customTaiProps.append(['%s.authorizeEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/protocol/openid-connect/auth' ])
+    #customTaiProps.append(['%s.idMap' % (providerId), 'localRealm'])
     #customTaiProps.append(['%s.issuerIdentifier' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8' ])
     #customTaiProps.append(['%s.jwkEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/protocol/openid-connect/certs' ])
     #customTaiProps.append(['%s.signatureAlgorithm' % (providerId), 'RS256'])
     #customTaiProps.append(['%s.tokenEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/protocol/openid-connect/token' ])
     #customTaiProps.append(['%s.userIdentifier' % (providerId), 'preferred_username'])
     customTaiProps.append(['%s.audiences' % (providerId), 'ALL_AUDIENCES'])
+    customTaiProps.append(['%s.clockSkew' % (providerId), '369'])
     customTaiProps.append(['%s.createSession' % (providerId), 'true'])
     customTaiProps.append(['%s.excludedPathFilter' % (providerId), '/activities/service/atom2/forms/communityEvent,/activities/service/atom2/.*,/activities/service/downloadExtended/.*,/blogs/roller-ui/BlogsWidgetEventHandler.do,/blogs/static/.*,/communities/calendar/Calendar.xml,/communities/calendar/handleEvent,/communities/calendar/seedlist/myserver,/communities/dsx/.*,/connections/rte/community/.*,/communities/recomm/handleEvent,/communities/recomm/Recomm.xml.*,/connections/opensocial/rest/people/.*,/connections/opensocial/basic/rest/.*,/connections/opensocial/rpc,/connections/resources/ic/.*,/connections/resources/web/.*,/docs/api/*,/dogear/seedlist/myserver,/files/static/.*,/files/wl/lifecycle/files,/forums/lifecycle/communityEvent,/homepage/web/itemSetPersistence.action/repos,/mobile/homepage/SecurityConfiguration,/news/seedlist/myserver,/news/web/statusUpdateEE.*,/news/widget/communityHandler.do,/profiles/dsx/.*,/profiles/seedlist/myserver,/viewer/api/*,/wikis/static/.*,/wikis/wl/lifecycle/wikis,/xcc/js/.*,/xcc/templates/.*'])
-    customTaiProps.append(['%s.idMap' % (providerId), 'localRealm'])
+    customTaiProps.append(['%s.includePortInDefaultRedirectUrl' % (providerId), 'false' ])
+    customTaiProps.append(['%s.mapIdentityToRegistryUser' % (providerId), 'true'])
     customTaiProps.append(['%s.realmIdentifier' % (providerId), 'realmName'])
-    customTaiProps.append(['%s.scope' % (providerId), 'openid' ])
+    customTaiProps.append(['%s.refreshBeforeAccessTokenExpiresTime' % (providerId), '30' ])
+    customTaiProps.append(['%s.scope' % (providerId), 'openid profile email' ])
     customTaiProps.append(['%s.setLtpaCookie' % (providerId), 'true'])
     customTaiProps.append(['%s.useDefaultIdentifierFirst' % (providerId), 'false'])
     customTaiProps.append(['%s.useDiscovery' % (providerId), 'true'])
     customTaiProps.append(['%s.useJwtFromRequest' % (providerId), 'ifPresent'])
-    customTaiProps.append(['%s.useRealm' % (providerId), 'WAS_DEFAULT'])
-    customTaiProps.append(['%s.useUrlCookies' % (providerId), 'true'])
     customTaiProps.append(['%s.userIdentifier' % (providerId), 'email'])
     customTaiProps.append(['%s.verifyIssuerInIat' % (providerId), 'true'])
     return customTaiProps
@@ -264,24 +266,24 @@ setupImpersonationTaiIfNotExist(interceptorClassName, customTaiProps)
 print ""
 
 # # Disable filter in OAuthTAI interceptor
-oauthInterceptorClassName = 'com.ibm.ws.security.oauth20.tai.OAuthTAI'
-print("Invalidating the TrustAssociationInterceptor '%s' filter properties to resolve TAI conflicts" % (oauthInterceptorClassName))
-for interceptor in AdminConfig.list('TAInterceptor', AdminConfig.getid('/Cell:/')).splitlines():
-    if AdminConfig.showAttribute(interceptor, 'interceptorClassName') == oauthInterceptorClassName:
-        propIds = AdminConfig.list('Property', interceptor).splitlines()
-        for propId in propIds:
-            propName = AdminConfig.showAttribute(propId, 'name')
-            if propName.find("filter") >= 0 and propName.find("__unused.") < 0:
-                print("   invalidate property '%s'" % (propName))
-                invalidatedPropName = "__unused." + propName
-                propValue = AdminConfig.showAttribute(propId, 'value')
-                invalidatedPropValue = "__unused." + propValue
-                # remove and recreate property with invalidated information
-                print("AdminConfig.remove(propId)")
-                AdminConfig.remove(propId)
-                print("AdminConfig.create(\"Property\", interceptor, [['name', %s],['value', %s],['description', 'Invalidated for MT']])" % (invalidatedPropName, invalidatedPropValue))
-                AdminConfig.create("Property", interceptor, [['name', invalidatedPropName],['value', invalidatedPropValue],['description', 'Invalidated for MT']])
-print("")
+# oauthInterceptorClassName = 'com.ibm.ws.security.oauth20.tai.OAuthTAI'
+# print("Invalidating the TrustAssociationInterceptor '%s' filter properties to resolve TAI conflicts" % (oauthInterceptorClassName))
+# for interceptor in AdminConfig.list('TAInterceptor', AdminConfig.getid('/Cell:/')).splitlines():
+#     if AdminConfig.showAttribute(interceptor, 'interceptorClassName') == oauthInterceptorClassName:
+#         propIds = AdminConfig.list('Property', interceptor).splitlines()
+#         for propId in propIds:
+#             propName = AdminConfig.showAttribute(propId, 'name')
+#             if propName.find("filter") >= 0 and propName.find("__unused.") < 0:
+#                 print("   invalidate property '%s'" % (propName))
+#                 invalidatedPropName = "__unused." + propName
+#                 propValue = AdminConfig.showAttribute(propId, 'value')
+#                 invalidatedPropValue = "__unused." + propValue
+#                 # remove and recreate property with invalidated information
+#                 print("AdminConfig.remove(propId)")
+#                 AdminConfig.remove(propId)
+#                 print("AdminConfig.create(\"Property\", interceptor, [['name', %s],['value', %s],['description', 'Invalidated for MT']])" % (invalidatedPropName, invalidatedPropValue))
+#                 AdminConfig.create("Property", interceptor, [['name', invalidatedPropName],['value', invalidatedPropValue],['description', 'Invalidated for MT']])
+# print("")
 
 # Step #8 - configure Resources > Cache Instances > Object cache instances
 print "Creating ObjectCache for OIDC RP"
@@ -322,8 +324,8 @@ print ""
 
 print("Configuring WebSphere Security to leverage TrustAssociationInterceptor '%s'" % (interceptorClassName))
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.DeferTAItoSSO=com.ibm.ws.security.oidc.client.RelyingParty"]]')
-AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.InvokeTAIbeforeSSO="]]')
-AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.performTAIForUnprotectedURI=true"]]')
+AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.InvokeTAIbeforeSSO=com.ibm.ws.security.oauth20.tai.OAuthTAI"]]')
+AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.performTAIForUnprotectedURI=false"]]')
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.customLTPACookieName=LtpaToken"]]')
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.customSSOCookieName=LtpaToken2"]]')
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.disableGetTokenFromMBean=false"]]')  

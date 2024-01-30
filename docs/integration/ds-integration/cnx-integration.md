@@ -1,5 +1,7 @@
 # Setting up OIDC for HCL Connections (CNX)
 
+Special thanks to the Three Thirds Teams (Wannes, Urs and Marcus) finding out the tiny tweaks to make it running.
+
 ## Configuring OIDC Authentication for CNX
 
 The following steps will configure your HCL Connections (CNX) installation to leverage OIDC based authentication with an OIDC compatible IdP, such as Keycloak. This means that CNX will be turned into an RP towards your IdP and leverage and trust it for authentication assertions.
@@ -102,7 +104,7 @@ Click on the **New..** button to create a new interceptor with the **Interceptor
 - `IDP_HOSTNAME`: Hostname of your keycloak server
 - `KEYCLOAK_REALMNAME`: Name of the Realm in Keycloak
 - `KEYCLOAK_CLIENTID`: Client Id for the OIDC Client in Keycloak
-- `KEYCLOAK_OIDC_SECRET`: OIDC secret created in Keycloak
+- `KEYCLOAK_CLIENTSECRET`: OIDC secret created in Keycloak
 - `DMGR_SSL_TRUST_KEYCLOAK`: Name of the trusted SSL Certificate in WebSphere
   Deployment Manager
 
@@ -119,22 +121,24 @@ Add the following custom properties and adjust with above variables:
 
 The values have fixed values and can just be copy and pasted:
 
-| Name                                  | Value                                                                                   |
-| ------------------------------------- | --------------------------------------------------------------------------------------- |
-| provider_1.audiences                  | ALL_AUDIENCES                                                                           |
-| provider_1.createSession              | true                                                                                    |
-| provider_1.excludedPathFilter         | /activities/service/atom2/forms/communityEvent,/activities/service/atom2/.*,/activities/service/downloadExtended/.*,/blogs/roller-ui/BlogsWidgetEventHandler.do,/blogs/static/.*,/communities/calendar/Calendar.xml,/communities/calendar/handleEvent,/communities/calendar/seedlist/myserver,/communities/dsx/.*,/connections/rte/community/.*,/communities/recomm/handleEvent,/communities/recomm/Recomm.xml.*,/connections/opensocial/rest/people/.*,/connections/opensocial/basic/rest/.*,/connections/opensocial/rpc,/connections/resources/ic/.*,/connections/resources/web/.*,/docs/api/*,/dogear/seedlist/myserver,/files/static/.*,/files/wl/lifecycle/files,/forums/lifecycle/communityEvent,/homepage/web/itemSetPersistence.action/repos,/mobile/homepage/SecurityConfiguration,/news/seedlist/myserver,/news/web/statusUpdateEE.*,/news/widget/communityHandler.do,/profiles/dsx/.*,/profiles/seedlist/myserver,/viewer/api/*,/wikis/static/.*,/wikis/wl/lifecycle/wikis,/xcc/js/.*,/xcc/templates/.*                                  |
-| provider_1.idMap                      | localRealm                                                                              |
-| provider_1.realmIdentifier            | realmName                                                                               | 
-| provider_1.scope                      | openid                                                                                  |
-| provider_1.setLtpaCookie              | true                                                                                    |
-| provider_1.useDefaultIdentifierFirst  | false                                                                                   |
-| provider_1.useDiscovery               | true                                                                                    |
-| provider_1.useJwtFromRequest          | ifPresent                                                                               |
-| provider_1.useRealm                   | WAS_DEFAULT                                                                             |
-| provider_1.useUrlCookies              | true                                                                                    |
-| provider_1.userIdentifier             | email                                                                                   |
-| provider_1.verifyIssuerInIat          | true                                                                                    |
+| Name                                           | Value                                                                                   |
+| -------------------------------------          | --------------------------------------------------------------------------------------- |
+| provider_1.audiences                           | ALL_AUDIENCES                                                                           |
+| provider_1.clockSkew                           | 369                                                                                     |
+| provider_1.createSession                       | true                                                                                    |
+| provider_1.excludedPathFilter                  | /activities/service/atom2/forms/communityEvent,/activities/service/atom2/.*,/activities/service/downloadExtended/.*,/blogs/roller-ui/BlogsWidgetEventHandler.do,/blogs/static/.*,/communities/calendar/Calendar.xml,/communities/calendar/handleEvent,/communities/calendar/seedlist/myserver,/communities/dsx/.*,/connections/rte/community/.*,/communities/recomm/handleEvent,/communities/recomm/Recomm.xml.*,/connections/opensocial/rest/people/.*,/connections/opensocial/basic/rest/.*,/connections/opensocial/rpc,/connections/resources/ic/.*,/connections/resources/web/.*,/docs/api/*,/dogear/seedlist/myserver,/files/static/.*,/files/wl/lifecycle/files,/forums/lifecycle/communityEvent,/homepage/web/itemSetPersistence.action/repos,/mobile/homepage/SecurityConfiguration,/news/seedlist/myserver,/news/web/statusUpdateEE.*,/news/widget/communityHandler.do,/profiles/dsx/.*,/profiles/seedlist/myserver,/viewer/api/*,/wikis/static/.*,/wikis/wl/lifecycle/wikis,/xcc/js/.*,/xcc/templates/.*                                  |
+| provider_1.includePortInDefaultRedirectUrl     | false |
+| provider_1.mapIdentityToRegistryUser           | true |
+| provider_1.realmIdentifier                     | realmName                                                                               |
+| provider_1.scope                               | openid profile email                                                                    |
+| provider_1.setLtpaCookie                       | true                                                                                    |
+| provider_1.refreshBeforeAccessTokenExpiresTime | 30 |
+| provider_1.useDefaultIdentifierFirst           | false                                                                                   |
+| provider_1.useDiscovery                        | true                                                                                    |
+| provider_1.useJwtFromRequest                   | ifPresent                                                                               |
+| provider_1.useRealm                            | WAS_DEFAULT                                                                             |
+| provider_1.userIdentifier                      | email                                                                                   |
+| provider_1.verifyIssuerInIat                   | true                                                                                    |
 
 Afterwards, hit **Apply** and **OK**. To persist the changes, click the link **Save** directly to the master configuration in the alert message.
 
@@ -142,26 +146,33 @@ Afterwards, hit **Apply** and **OK**. To persist the changes, click the link **S
 
 Some custom properties have to be updated to match the OIDC TAI config and its expected behavior. To do so, go to **Security** &rarr; **Global security** &rarr; **Custom properties**.
 
-First, delete the property `com.ibm.websphere.security.InvokeTAIbeforeSSO` if it exists.
-
-Change `com.ibm.websphere.security.DeferTAItoSSO` to replace existing with `com.ibm.ws.security.oidc.client.RelyingParty`
+Change `` to replace existing with `com.ibm.ws.security.oidc.client.RelyingParty`
 
 Afterwards, add or update following properties:
 
 | Name                                                    | Value            |
 | ------------------------------------------------------- | ---------------- |
-| com.ibm.websphere.security.performTAIForUnprotectedURI  | true             |
-| com.ibm.websphere.security.customLTPACookieName         | LtpaToken        |
+| com.ibm.websphere.security.DeferTAItoSSO                | com.ibm.ws.security.oidc.client.RelyingParty |
+| com.ibm.websphere.security.InvokeTAIbeforeSSO           | com.ibm.ws.security.oauth20.tai.OAuthTAI  |
+| com.ibm.websphere.security.performTAIForUnprotectedURI  | false |
+| com.ibm.websphere.security.customLTPACookieName         | |
 | com.ibm.websphere.security.customSSOCookieName          | LtpaToken2       |
 | com.ibm.websphere.security.disableGetTokenFromMBean     | false            |
 | com.ibm.websphere.security.alwaysRestoreOriginalURL     | false            |
 
 Persist the changes via the **Save** link.
 
+### Create JAAS `oidcRTEClientAuth`
+
+- Name: `oidcRTEClientAuth`
+- UserID: `KEYCLOAK_CLIENTID` (set to your client id)
+- Password: `KEYCLOAK_CLIENTSECRET`
+
 ## Adding an external realm
 
 In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; `https://IDP_HOSTNAME/realms/KEYCLOAK_REALMNAME`
 
+If you use `provider_x.useRealm=WAS_DEFAULT` this is not necessary, because all token and cookie contain `defaultWIMFileBasedRealm` as the realmName. And this is always trusted. This needs at least WebSphere 8.5.5 FP23!
 
 ### Restarting the server
 
@@ -178,6 +189,8 @@ In the ISC, navigate to **Security** &rarr; **federated repositories** –> **co
 - Go to the ISC
 - Navigate to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **Select app** &rarr; **Security role to user/group mapping**
 - Change from All Authenticated in Application's Realms to All Authenticated in Trusted Realms
+- Set all Everyone Roles to `All Authenticated in Trusted Realms`
+- Set RichTextEditors `Everyone` role to `None`
 - Then click **OK** and **save** to the master configuration.
 - Follow above step for all apps
 
@@ -188,16 +201,6 @@ In the ISC, navigate to **Security** &rarr; **federated repositories** –> **co
 ```Apache
 Header edit Set-Cookie ^(.*)$ "$1; SameSite=None;Secure"
 Redirect "/realms/hcl/.well-known/openid-configuration" "https://<IDP_HOSTNAME>/realms/hcl/.well-known/openid-configuration"
-
-Redirect /communities/login /communities/service/html/login
-Redirect /homepage/login /homepage
-Redirect /homepage/auth/login.jsp /homepage
-Redirect /activities/auth/login.jsp /activities
-Redirect /profiles/login /profiles/html/myProfileView.do
-RedirectMatch /profiles/profile.do(.*) /profiles/html/myprofile.do$1
-Redirect /forums/auth/login /forums/html/my
-Redirect /blogs/login /blogs/roller-ui/myblogs/edit
-Redirect /mobileAdmin/login /mobileAdmin/console
 ```
 
 Make sure to save the changes.
@@ -219,7 +222,7 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
   - LCC Changes:
 
     ```xml
-    <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="true" serviceName="oidc_op" ssl_enabled="true">
+    <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="false" serviceName="oidc_op" ssl_enabled="false">
       <sloc:href>
         <sloc:hrefPathPrefix>/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration</sloc:hrefPathPrefix>
         <sloc:static href="http://IDP_HOSTNAME" ssl_href="https://IDP_HOSTNAME"/>
@@ -231,9 +234,9 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
   - Add/Edit Below generic props
 
     ```xml
-    <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokens">true</genericProperty>  
+    <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokens">true</genericProperty>
     <genericProperty name="com.hcl.connections.rte.acceptIncomingOAuthTokensFromSubject">true</genericProperty>
-    <genericProperty name="com.hcl.connections.rte.azureEnabled">true</genericProperty>
+    <genericProperty name="com.hcl.connections.rte.azureEnabled">false</genericProperty>
     ```
 
   - HCL Connections has default client id as "hcl-cnx-oidc-client", can be overridden by adding/updating below generic property
