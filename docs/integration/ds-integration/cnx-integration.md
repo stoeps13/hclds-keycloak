@@ -163,18 +163,8 @@ Afterwards, add or update following properties:
 
 Persist the changes via the **Save** link.
 
-### Create JAAS `oidcRTEClientAuth`
-
-- Name: `oidcRTEClientAuth`
-- UserID: `KEYCLOAK_CLIENTID` (set to your client id)
-- Password: `KEYCLOAK_CLIENTSECRET`
-
-## Adding an external realm
-
-In the ISC, navigate to **Security** &rarr; **federated repositories** –> **configure** &rarr; **Trusted authentication realms – inbound** &rarr; **Add external realm** &rarr; `https://IDP_HOSTNAME/realms/KEYCLOAK_REALMNAME`
-
 >[!NOTE]
-> If you use `provider_x.useRealm=WAS_DEFAULT` this is not necessary, because all token and cookie contain `defaultWIMFileBasedRealm` as the realmName. And this is always trusted. This needs at least WebSphere 8.5.5 FP23!
+> We use `provider_x.useRealm=WAS_DEFAULT`, so all token and cookie contain `defaultWIMFileBasedRealm` as the realmName. And this is always trusted. This needs at least WebSphere 8.5.5 FP23!
 
 ### Restarting the server
 
@@ -186,34 +176,12 @@ In the ISC, navigate to **Security** &rarr; **federated repositories** –> **co
 /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/bin/startNode.sh
 ```
 
-## Changing security roles for users and groups in CNX applications
+## Changing security roles for users and groups in RichTextEditors
 
 - Go to the ISC
-- Navigate to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **Select app** &rarr; **Security role to user/group mapping**
-- Change from All Authenticated in Application's Realms to All Authenticated in Trusted Realms
-- Set all Everyone Roles to `All Authenticated in Trusted Realms`
-- Set RichTextEditors `Everyone` role to `None`
+- Navigate to **Applications** &rarr; **Application types** &rarr; **Enterprise Applications** &rarr; **Select RichTextEditors** &rarr; **Security role to user/group mapping**
+- Set `Everyone` role to `None`
 - Then click **OK** and **save** to the master configuration.
-- Follow above step for all apps
-
-## Updating httpd.conf file for redirection rules
-
-### `/opt/IBM/HTTPServer/conf/httpd.conf`
-
-```Apache
-Header edit Set-Cookie ^(.*)$ "$1; SameSite=None;Secure"
-Redirect "/realms/hcl/.well-known/openid-configuration" "https://<IDP_HOSTNAME>/realms/hcl/.well-known/openid-configuration"
-```
-
-Make sure to save the changes.
-
-### Restarting the IHS server
-
-```bash
-cd /opt/IBM/HTTPServer/bin/
-sudo /opt/IBM/HTTPServer/bin/apachectl -k stop
-sudo /opt/IBM/HTTPServer/bin/apachectl -k start
-```
 
 ## Updating the LotusConnections-config
 
@@ -222,6 +190,8 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
 ### `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CELLNAME/LotusConnections-config/LotusConnections-config.xml`
 
 - LCC Changes:
+
+`oidc_op` is not needed with Keycloak. Just check that the serviceReference is disabled.
 
 ```xml
 <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="false" serviceName="oidc_op" ssl_enabled="false">
