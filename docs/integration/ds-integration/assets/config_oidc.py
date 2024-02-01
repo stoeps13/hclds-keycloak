@@ -54,13 +54,15 @@ def getCommonCustomTaiProps(providerId):
     # Name of trusted Certificate in DMGR
     customTaiProps.append(['%s.signVerifyAlias' % (providerId), 'stoeps-idp-cert' ])
     # -----------------------------
-    #customTaiProps.append(['%s.useRealm' % (providerId), 'WAS_DEFAULT'])
+    # customTaiProps.append(['%s.realmIdentifier' % (providerId), 'realmName'])
+    # customTaiProps.append(['%s.useDefaultIdentifierFirst' % (providerId), 'false'])
     #customTaiProps.append(['%s.authorizeEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/protocol/openid-connect/auth' ])
     #customTaiProps.append(['%s.idMap' % (providerId), 'localRealm'])
     #customTaiProps.append(['%s.issuerIdentifier' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8' ])
     #customTaiProps.append(['%s.jwkEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/protocol/openid-connect/certs' ])
     #customTaiProps.append(['%s.signatureAlgorithm' % (providerId), 'RS256'])
     #customTaiProps.append(['%s.tokenEndpointUrl' % (providerId), 'https://cnx-keycloak.stoeps.home/realms/kccnx8/protocol/openid-connect/token' ])
+    #customTaiProps.append(['%s.useRealm' % (providerId), 'WAS_DEFAULT'])
     #customTaiProps.append(['%s.userIdentifier' % (providerId), 'preferred_username'])
     customTaiProps.append(['%s.audiences' % (providerId), 'ALL_AUDIENCES'])
     customTaiProps.append(['%s.clockSkew' % (providerId), '369'])
@@ -68,11 +70,9 @@ def getCommonCustomTaiProps(providerId):
     customTaiProps.append(['%s.excludedPathFilter' % (providerId), '/activities/service/atom2/forms/communityEvent,/activities/service/atom2/.*,/activities/service/downloadExtended/.*,/blogs/roller-ui/BlogsWidgetEventHandler.do,/blogs/static/.*,/communities/calendar/Calendar.xml,/communities/calendar/handleEvent,/communities/calendar/seedlist/myserver,/communities/dsx/.*,/connections/rte/community/.*,/communities/recomm/handleEvent,/communities/recomm/Recomm.xml.*,/connections/opensocial/rest/people/.*,/connections/opensocial/basic/rest/.*,/connections/opensocial/rpc,/connections/resources/ic/.*,/connections/resources/web/.*,/docs/api/*,/dogear/seedlist/myserver,/files/static/.*,/files/wl/lifecycle/files,/forums/lifecycle/communityEvent,/homepage/web/itemSetPersistence.action/repos,/mobile/homepage/SecurityConfiguration,/news/seedlist/myserver,/news/web/statusUpdateEE.*,/news/widget/communityHandler.do,/profiles/dsx/.*,/profiles/seedlist/myserver,/viewer/api/*,/wikis/static/.*,/wikis/wl/lifecycle/wikis,/xcc/js/.*,/xcc/templates/.*'])
     customTaiProps.append(['%s.includePortInDefaultRedirectUrl' % (providerId), 'false' ])
     customTaiProps.append(['%s.mapIdentityToRegistryUser' % (providerId), 'true'])
-    customTaiProps.append(['%s.realmIdentifier' % (providerId), 'realmName'])
     customTaiProps.append(['%s.refreshBeforeAccessTokenExpiresTime' % (providerId), '30' ])
     customTaiProps.append(['%s.scope' % (providerId), 'openid profile email' ])
     customTaiProps.append(['%s.setLtpaCookie' % (providerId), 'true'])
-    customTaiProps.append(['%s.useDefaultIdentifierFirst' % (providerId), 'false'])
     customTaiProps.append(['%s.useDiscovery' % (providerId), 'true'])
     customTaiProps.append(['%s.useJwtFromRequest' % (providerId), 'ifPresent'])
     customTaiProps.append(['%s.userIdentifier' % (providerId), 'email'])
@@ -82,9 +82,7 @@ def getCommonCustomTaiProps(providerId):
 def getRequiredInterceptedPathFilterForApps(apps):
     interceptedPathFilterArray=[]
     for app in apps:
-        if app == 'sso-login':
-            interceptedPathFilterArray.append('/sso-login/.*')
-        elif app == 'Activities':
+        if app == 'Activities':
             interceptedPathFilterArray.append('/activities/.*')
         elif app == 'Blogs':
             interceptedPathFilterArray.append('/blogs/.*')
@@ -328,8 +326,8 @@ AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.performTAIForUnprotectedURI=false"]]')
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.customLTPACookieName=LtpaToken"]]')
 AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.customSSOCookieName=LtpaToken2"]]')
-AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.disableGetTokenFromMBean=false"]]')  
-AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.alwaysRestoreOriginalURL=false"]]')  
+AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.disableGetTokenFromMBean=false"]]')
+AdminTask.setAdminActiveSecuritySettings('[-customProperties ["com.ibm.websphere.security.alwaysRestoreOriginalURL=false"]]')
 print("")
 
 AdminConfig.save()
