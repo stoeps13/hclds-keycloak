@@ -21,9 +21,7 @@ On a high level, the following tasks will be executed to establish this configur
 - Configure the OIDC RP TAI against your IdP
 - Add the server certificate to the WAS trust store to allow internal HTTPS communication
 - Update WAS security properties to match the new TAI requirements
-- Add external realm in federated repository
 - Change role mappings in CNX applications
-- Add redirection rules in IHS
 - Update the LotusConnections-config
 - Validate everything is working as expected
 
@@ -32,9 +30,9 @@ On a high level, the following tasks will be executed to establish this configur
 
 Please be aware that configuring OIDC as the authentication protocol has certain implications to how features behave and have to be used or configured. Some of those implications are:
 
-- Only users in the repository of the IdP can authenticate via OIDC. Users in other repositories, such as administrative users in the file registry, must bypass OIDC to authenticate.
-- The outlined steps will still require the WebSphere server to have a federation to the same user directory set up in order to resolve users. There are ways to leverage underlying WAS capabilities to remove the dependency to a federation which have some caveats in their own right. This is subject to be elaborated on as part of this documentation in a later iteration.
-- This procedure requires that the IdP and HCL CNX leverage the same user repository. There are ways to leverage underlying WAS capabilities to remove the dependency to a federation which have some caveats in their own right. This is subject to be elaborated on as part of this documentation in a later iteration.
+- Only users in the repository of the IdP can authenticate via OIDC. ~~Users in other repositories, such as administrative users in the file registry, must bypass OIDC to authenticate.~~
+- ~~The outlined steps will still require the WebSphere server to have a federation to the same user directory set up in order to resolve users. There are ways to leverage underlying WAS capabilities to remove the dependency to a federation which have some caveats in their own right. This is subject to be elaborated on as part of this documentation in a later iteration.~~
+- ~~This procedure requires that the IdP and HCL CNX leverage the same user repository. There are ways to leverage underlying WAS capabilities to remove the dependency to a federation which have some caveats in their own right. This is subject to be elaborated on as part of this documentation in a later iteration.~~
 - Unprotected or anonymous access is prevented through this configuration. A user needs to exist in order to access any CNX content and pages.
 
 
@@ -46,8 +44,8 @@ Although these tasks will generally work, we are using references for how a conf
 - An IdP is set up and configured. Required details like the client id or secrets are available to configure during the below tasks.
 - A Keycloak service (specifically, the HCL DS branded Keycloak version) is being used as the IdP (The OIDC layer will look mostly the same with any other IdP but can't be guaranteed due to the extensive landscape of providers)
 
-- **Note** - As an additional note to the above point on the used HCL DS branded Keycloak service, there are a couple of steps that have to be conducted to set up the OIDC layer on the IdP side. This includes e.g. the setup of a realm, client, user federation and custom claims. The document [Configure Keycloak as an OIDC IdP for HCL Connections](./cnx-keycloak-configuration.md) provides details steps on setting up all necessary parts. If you are using a different IdP, this might still be relevant to confirm you are setting the OIDC layer up in a way that will work with DX.
-
+>[!NOTE]
+> As an additional note to the above point on the used HCL DS branded Keycloak service, there are a couple of steps that have to be conducted to set up the OIDC layer on the IdP side. This includes e.g. the setup of a realm, client, user federation and custom claims. The document [Configure Keycloak as an OIDC IdP for HCL Connections](./cnx-keycloak-configuration.md) provides details steps on setting up all necessary parts. If you are using a different IdP, this might still be relevant to confirm you are setting the OIDC layer up in a way that will work with DX.
 
 ## Installing the OIDCRP TAI
 
@@ -195,7 +193,7 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
 
 ### `/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/cells/WEBSPHERE_CELLNAME/LotusConnections-config/LotusConnections-config.xml`
 
-- LCC Changes:
+- `LotusConnections-config.xml` Changes:
 
 `oidc_op` is not needed with Keycloak. Just check that the serviceReference is disabled.
 
@@ -203,8 +201,8 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
 <sloc:serviceReference bootstrapHost="admin_replace" bootstrapPort="admin_replace" clusterName="" enabled="false" serviceName="oidc_op" ssl_enabled="false">
   <sloc:href>
     <sloc:hrefPathPrefix>/realms/KEYCLOAK_REALMNAME/.well-known/openid-configuration</sloc:hrefPathPrefix>
-    <sloc:static href="http://IDP_HOSTNAME" ssl_href="https://IDP_HOSTNAME"/>
-    <sloc:interService href="https://IDP_HOSTNAME"/>
+    <sloc:static href="admin_replace" ssl_href="admin_replace"/>
+    <sloc:interService href="admin_replace"/>
   </sloc:href>
 </sloc:serviceReference>
 ```
@@ -217,16 +215,11 @@ Next, we need to make a couple of updates in the `LotusConnections-config.xml` t
 <genericProperty name="com.hcl.connections.rte.azureEnabled">false</genericProperty>
 ```
 
+- TODO: It would be useful, if development could add details about differences with Keycloak and Azure for example. Which combinations should work?
 - HCL Connections has default client id as "hcl-cnx-oidc-client", can be overridden by adding/updating below generic property
 
 ```xml
 <genericProperty name="oidcClientId">KEYCLOAK_CLIENTID</genericProperty>
-```
-
-### Add Service entry in `service-location.xsd` file (If not present)
-
-```xml
-<xsd:enumeration value="oidc_op"/>
 ```
 
 ### Update `opensocial-config.xml`
