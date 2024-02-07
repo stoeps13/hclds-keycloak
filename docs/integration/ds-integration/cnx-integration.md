@@ -1,3 +1,7 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+THIS IS WORK IN PROGRESS!!! I try to get OIDC running with HCL Connections and started noting changes from the official documentation!
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 # Setting up OIDC for HCL Connections (CNX)
 
 Special thanks to the Three Thirds Teams (Wannes, Urs and Marcus) finding out the tiny tweaks to make it running.
